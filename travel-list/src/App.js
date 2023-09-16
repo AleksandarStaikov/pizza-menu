@@ -39,5 +39,5 @@ export default function App() {
       />
       <Stats items={items} />
     </div>
-  );
+  ); 
 }
