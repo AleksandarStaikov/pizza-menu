@@ -9,7 +9,7 @@ const average = (arr) =>
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
-  const [query, setQuery] = useState("matrix");
+  const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
@@ -29,12 +29,14 @@ export default function App() {
   }
 
   useEffect(
-    function () {
-      async function fetchData() {
+    function fetchMoviesData() {
+      const abortController = new AbortController();
+      async function fetchMoviesDataAsync() {
         try {
           setIsLoading(true);
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`,
+            { signal: abortController.signal }
           );
 
           if (!res.ok) throw new Error("Something went wrong");
@@ -44,6 +46,7 @@ export default function App() {
           setMovies(data.Search);
           setError("");
         } catch (err) {
+          if (err.name === "AbortError") return;
           setError(err.message);
         } finally {
           setIsLoading(false);
@@ -56,7 +59,12 @@ export default function App() {
         return;
       }
 
-      fetchData();
+      setSelectedId(null);
+      fetchMoviesDataAsync();
+
+      return () => {
+        abortController.abort();
+      };
     },
     [query]
   );
@@ -301,19 +309,49 @@ function SelectedMovieDetails({
     onCloseMovie();
   }
 
-  useEffect(() => {
-    async function fetchMovieDetails() {
-      setIsLoading(true);
-      const res = await fetch(
-        `http://www.omdbapi.com/?apikey=${API_KEY}&i=${selectedId}`
-      );
-      const data = await res.json();
-      setMovieDetails(data);
-      setIsLoading(false);
-    }
+  useEffect(
+    function fetchMovieDetails() {
+      async function fetchMovieDetailsAsync() {
+        setIsLoading(true);
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${API_KEY}&i=${selectedId}`
+        );
+        const data = await res.json();
+        setMovieDetails(data);
+        setIsLoading(false);
+      }
 
-    if (selectedId) fetchMovieDetails();
-  }, [selectedId]);
+      if (selectedId) fetchMovieDetailsAsync();
+    },
+    [selectedId]
+  );
+
+  useEffect(
+    function updatePageTitle() {
+      if (!title) return;
+      document.title = `Movie | ${title}`;
+
+      return () => {
+        document.title = "usePopcorn";
+      };
+    },
+    [title]
+  );
+
+  useEffect(
+    function ListenForEscKey() {
+      function callback(e) {
+        if (e.key === "Escape") onCloseMovie(null);
+      }
+
+      document.addEventListener("keydown", callback);
+
+      return () => {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMovie]
+  );
 
   if (isLoading) return <Loader />;
 
