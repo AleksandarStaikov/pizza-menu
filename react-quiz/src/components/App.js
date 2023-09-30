@@ -11,7 +11,7 @@ import FinishScreen from "./FinishScreen";
 import Footer from "./Footer";
 import Timer from "./Timer";
 
-const SEC_PER_QUESTION = 10;
+const SEC_PER_QUESTION = 1;
 
 const initialState = {
   questions: [],
@@ -63,12 +63,6 @@ const reducer = function (state, action) {
         highscore: state.highscore,
         secondsRemaining: state.questions.length * SEC_PER_QUESTION,
       };
-    case "tick":
-      return {
-        ...state,
-        secondsRemaining: state.secondsRemaining - 1,
-        status: state.secondsRemaining <= 0 ? "finished" : state.status,
-      };
     default:
       throw new Error(`Unhandled action type: ${action.type}`);
   }
@@ -116,7 +110,7 @@ export default function App() {
               answer={answer}
             />
             <Footer>
-              <Timer secondsRemaining={secondsRemaining} dispatch={dispatch} />
+              <Timer secondsToComplete={secondsRemaining} dispatch={dispatch} />
               <NextButton
                 dispatch={dispatch}
                 answer={answer}

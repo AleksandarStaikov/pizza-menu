@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export default function Timer({ secondsRemaining, dispatch }) {
+export default function Timer({ secondsToComplete, dispatch }) {
+  const [secondsRemaining, setSecondsRemaining] = useState(secondsToComplete);
+
   const minutes = Math.floor(secondsRemaining / 60)
     .toString()
     .padStart(2, "0");
@@ -8,11 +10,17 @@ export default function Timer({ secondsRemaining, dispatch }) {
 
   useEffect(() => {
     var intervalId = setInterval(() => {
-      dispatch({ type: "tick" });
+      if (secondsRemaining === 0) {
+        dispatch({ type: "finish" });
+        return;
+      }
+      setSecondsRemaining(function (secondsRemaining) {
+        return secondsRemaining - 1;
+      });
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [dispatch]);
+  }, [dispatch, secondsRemaining]);
 
   return <div className="timer">{`${minutes}:${seconds}`}</div>;
 }
