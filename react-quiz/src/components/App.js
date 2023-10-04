@@ -11,7 +11,7 @@ import FinishScreen from "./FinishScreen";
 import Footer from "./Footer";
 import Timer from "./Timer";
 
-const SEC_PER_QUESTION = 1;
+const SEC_PER_QUESTION = 10;
 
 const initialState = {
   questions: [],
