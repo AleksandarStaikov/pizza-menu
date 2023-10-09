@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import styles from "./CityItem.module.css";
+import { useCities } from "../contexts/CitiesContext";
 
 const formatDate = (date) =>
   new Intl.DateTimeFormat("en", {
@@ -9,13 +10,18 @@ const formatDate = (date) =>
   }).format(new Date(date));
 
 function CityItem({ city }) {
+  const { currentCity } = useCities();
   const { cityName, emoji, date, id, position } = city;
+
+  const isSelected = currentCity.id === id;
 
   return (
     <li>
       <Link
         to={`${id}?lat=${position.lat}&lng=${position.lng}`}
-        className={styles.cityItem}
+        className={`${styles.cityItem} ${
+          isSelected ? styles.cityItemActive : ""
+        }`}
       >
         <img src={`https://flagcdn.com/w40/${emoji}.png`} alt={emoji} />
         <h3 className={styles.name}>{cityName}</h3>
