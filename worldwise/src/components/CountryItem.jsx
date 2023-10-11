@@ -5,7 +5,7 @@ function CountryItem({ country }) {
     <li className={styles.countryItem}>
       <span>
         <img
-          src={`https://flagcdn.com/w40/${country.emoji}.png`}
+          src={`https://flagcdn.com/w20/${country.emoji}.png`}
           alt={country.country}
         />
       </span>

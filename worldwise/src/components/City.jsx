@@ -23,7 +23,7 @@ function City() {
     getCity(cityId);
   }, [cityId]);
 
-  if (isLoading) return <Spinner />;
+  if (isLoading || !currentCity) return <Spinner />;
 
   return (
     <div className={styles.city}>
