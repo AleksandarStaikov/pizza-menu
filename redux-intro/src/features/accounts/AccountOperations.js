@@ -10,7 +10,7 @@ function AccountOperations() {
   const [currency, setCurrency] = useState("USD");
 
   const dispatch = useDispatch();
-  const { balance, isLoading } = useSelector((state) => state.account);
+  const { loan, isLoading } = useSelector((state) => state.account);
 
   function handleDeposit() {
     if (!depositAmount) return;
@@ -92,7 +92,7 @@ function AccountOperations() {
         </div>
 
         <div>
-          <span>Pay back {balance}</span>
+          <span>Pay back {loan}</span>
           <button onClick={handlePayLoan}>Pay loan</button>
         </div>
       </div>
