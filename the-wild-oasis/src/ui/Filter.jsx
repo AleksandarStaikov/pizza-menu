@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import { createContext } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled, { css } from "styled-components";
 
 const StyledFilter = styled.div`
@@ -15,11 +18,12 @@ const FilterButton = styled.button`
   border: none;
 
   ${(props) =>
-    props.active &&
-    css`
-      background-color: var(--color-brand-600);
-      color: var(--color-brand-50);
-    `}
+    props.$active
+      ? css`
+          background-color: var(--color-brand-600);
+          color: var(--color-brand-50);
+        `
+      : ``}
 
   border-radius: var(--border-radius-sm);
   font-weight: 500;
@@ -33,3 +37,42 @@ const FilterButton = styled.button`
     color: var(--color-brand-50);
   }
 `;
+
+const FilterContext = createContext();
+
+function Filter({ filterName, children }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentFilter = searchParams.get(filterName);
+
+  function handleClick(value) {
+    searchParams.set(filterName, value);
+    setSearchParams(searchParams);
+  }
+
+  return (
+    <FilterContext.Provider value={{ handleClick, currentFilter }}>
+      <StyledFilter>{children}</StyledFilter>
+    </FilterContext.Provider>
+  );
+}
+
+function Button({ value, children, ...props }) {
+  const { handleClick, currentFilter } = useContext(FilterContext);
+  const isDefault = "default" in props;
+
+  const isActive = currentFilter ? currentFilter === value : isDefault;
+
+  return (
+    <FilterButton
+      $active={isActive}
+      disabled={isActive}
+      onClick={() => handleClick(value)}
+    >
+      {children}
+    </FilterButton>
+  );
+}
+
+Filter.Button = Button;
+
+export default Filter;
